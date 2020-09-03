@@ -22,7 +22,11 @@ It is possible to avoid conflicts by doing something like this: `{ "name": "test
 ### Case ID
 
 To connect your test with TestRail case you have to place TestRail case ID (like, *C123*) to
-the test name field, but you have to change *C* to *#*, so `C123` will be `#123`
+the test meta, but you have to remove *C*, so the test should look like:
+
+```js
+test.meta({ CID: 123 })('test things', async t => {})
+```
 
 # Environment variables
 

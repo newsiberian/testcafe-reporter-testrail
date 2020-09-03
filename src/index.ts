@@ -9,6 +9,10 @@ interface TestRunInfo {
   skipped: boolean;
 }
 
+interface TestMeta {
+  CID?: number;
+}
+
 /**
  * @see: https://www.gurock.com/testrail/docs/api/reference/statuses
  */
@@ -39,21 +43,15 @@ module.exports = function() {
       // NOTE: This method is optional.
     },
 
-    reportTestDone(name: string, testRunInfo: TestRunInfo) {
-      if (!name.includes('#')) {
-        this.throwError(
-          `Can\'t find Testrail test id in test (${name}) name. Please use "#" before it`,
-        );
+    reportTestDone(name: string, testRunInfo: TestRunInfo, meta: TestMeta) {
+      console.log(meta);
+      if (typeof meta.CID !== 'number') {
+        this.throwError(`Can\'t find Testrail Case ID in test (${name}) meta`);
 
         // exit when not test id found
         return;
       }
 
-      // extracting testrail test id from test name
-      const dirtyTestId = name
-        .split(' ')
-        .filter(chunk => chunk.includes('#'))[0];
-      const testId = dirtyTestId.slice(1);
       const status = getTestStatus(testRunInfo);
 
       const commentObj =
@@ -64,7 +62,7 @@ module.exports = function() {
           : {};
 
       this.results.push({
-        case_id: +testId,
+        case_id: meta.CID,
         status_id: status,
         // @ts-ignore
         elapsed: this.moment
