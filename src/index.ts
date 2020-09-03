@@ -44,6 +44,9 @@ module.exports = function() {
         this.throwError(
           `Can\'t find Testrail test id in test (${name}) name. Please use "#" before it`,
         );
+
+        // exit when not test id found
+        return;
       }
 
       // extracting testrail test id from test name
@@ -61,7 +64,7 @@ module.exports = function() {
           : {};
 
       this.results.push({
-        test_id: +testId,
+        case_id: +testId,
         status_id: status,
         // @ts-ignore
         elapsed: this.moment
@@ -105,7 +108,7 @@ module.exports = function() {
         const { body: runs } = await testrail.getRuns(projectId, {});
         const testRunId = this.getTestRunId(runs);
 
-        await testrail.addResults(testRunId, this.results);
+        await testrail.addResultsForCases(testRunId, this.results);
       } catch (err) {
         // @ts-ignore
         this.newline()

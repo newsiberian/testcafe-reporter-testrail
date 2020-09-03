@@ -19,6 +19,11 @@ Reporter name is `testrail`.
 This reporter doesn't generate direct output, and it could lead to conflict if you leave `output` setting untouched.
 It is possible to avoid conflicts by doing something like this: `{ "name": "testrail", "output": "/dev/null" }`.
 
+### Case ID
+
+To connect your test with TestRail case you have to place TestRail case ID (like, *C123*) to
+the test name field, but you have to change *C* to *#*, so `C123` will be `#123`
+
 # Environment variables
 
 You must provide the following variables
