@@ -41,7 +41,7 @@ module.exports = function() {
 
     reportTestDone(name: string, testRunInfo: TestRunInfo) {
       if (!name.includes('#')) {
-        throwError(
+        this.throwError(
           `Can\'t find Testrail test id in test (${name}) name. Please use "#" before it`,
         );
       }
@@ -83,9 +83,13 @@ module.exports = function() {
         !process.env.TESTRAIL_PROJECT_NAME ||
         !process.env.TESTRAIL_RUN_NAME
       ) {
-        throwError(
+        this.throwError(
           'Error: TESTRAIL_HOST, TESTRAIL_USERNAME, TESTRAIL_PASS_OR_KEY, TESTRAIL_PROJECT_NAME and TESTRAIL_RUN_NAME must be set as environment variables for the reporter plugin to push the result to the Testrail',
         );
+
+        // when not all variables are provided, we do nothing. This can be useful for development purposes, when
+        // you don't want to send results
+        return;
       }
 
       const testrail = new TestrailApiClient({
@@ -96,10 +100,10 @@ module.exports = function() {
 
       try {
         const { body: projects } = await testrail.getProjects();
-        const projectId = getProjectId(projects);
+        const projectId = this.getProjectId(projects);
 
         const { body: runs } = await testrail.getRuns(projectId, {});
-        const testRunId = getTestRunId(runs);
+        const testRunId = this.getTestRunId(runs);
 
         await testrail.addResults(testRunId, this.results);
       } catch (err) {
@@ -109,6 +113,47 @@ module.exports = function() {
           .write(this.chalk.red.bold(this.symbols.err))
           .write(err.message.error);
       }
+    },
+
+    getProjectId(projects: TestrailApiClient.IProject[]): number | never {
+      const index = projects.findIndex(
+        project =>
+          project.name.toLowerCase() ===
+          (process.env.TESTRAIL_PROJECT_NAME as string).toLowerCase(),
+      );
+
+      if (index !== -1) {
+        return projects[index].id;
+      }
+
+      this.throwError('Project not found');
+      process.exit(1);
+    },
+
+    getTestRunId(projects: TestrailApiClient.ITestRun[]): number | never {
+      const index = projects.findIndex(
+        project =>
+          project.name.toLowerCase() ===
+          (process.env.TESTRAIL_RUN_NAME as string).toLowerCase(),
+      );
+
+      if (index !== -1) {
+        return projects[index].id;
+      }
+
+      this.throwError('Test run not found');
+      process.exit(1);
+    },
+
+    throwError(text: string): void {
+      // @ts-ignore
+      this.newline()
+        .write(
+          // @ts-ignore
+          this.chalk.red.bold(text),
+        )
+        .newline()
+        .newline();
     },
   };
 };
@@ -121,44 +166,4 @@ function getTestStatus(testRunInfo: TestRunInfo): TestStatus {
     return TestStatus.Untested;
   }
   return TestStatus.Passed;
-}
-
-function getProjectId(projects: TestrailApiClient.IProject[]): number | never {
-  const index = projects.findIndex(
-    project =>
-      project.name.toLowerCase() ===
-      (process.env.TESTRAIL_PROJECT_NAME as string).toLowerCase(),
-  );
-
-  if (index !== -1) {
-    return projects[index].id;
-  }
-
-  throwError('Project not found');
-}
-
-function getTestRunId(projects: TestrailApiClient.ITestRun[]): number | never {
-  const index = projects.findIndex(
-    project =>
-      project.name.toLowerCase() ===
-      (process.env.TESTRAIL_RUN_NAME as string).toLowerCase(),
-  );
-
-  if (index !== -1) {
-    return projects[index].id;
-  }
-
-  throwError('Test run not found');
-}
-
-function throwError(text: string): never {
-  // @ts-ignore
-  this.newline()
-    .write(
-      // @ts-ignore
-      this.chalk.red.bold(text),
-    )
-    .newline()
-    .newline();
-  process.exit(1);
 }
