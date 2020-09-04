@@ -4,7 +4,7 @@ import TestrailApiClient from 'testrail-api';
  * @see: https://devexpress.github.io/testcafe/documentation/reference/plugin-api/reporter.html#testruninfo-object
  */
 interface TestRunInfo {
-  errs: { errMsg: string }[];
+  errs: { errMsg: string; diff: string }[];
   durationMs: number;
   skipped: boolean;
 }
@@ -112,7 +112,8 @@ module.exports = function() {
         this.newline()
           // @ts-ignore
           .write(this.chalk.red.bold(this.symbols.err))
-          .write(err.message.error);
+          // @ts-ignore
+          .write(this.formatError(err.message.error));
       }
     },
 
