@@ -1,15 +1,15 @@
-# testcafe-reporter-testrail
+# testcafe-reporter-testrail-alter
 
-This is a TestCafe reporter pluging for TestRail. It publishes test run results to TestRail.  
+This is a TestCafe reporter plugin for TestRail. It publishes test run results to TestRail.  
 
 # Install
 
 ```shell script
-npm install testcafe-reporter-testrail
+npm install testcafe-reporter-testrail-alter
 ```
 or
 ```shell script
-yarn add testcafe-reporter-testrail
+yarn add testcafe-reporter-testrail-alter
 ```
 
 # Usage

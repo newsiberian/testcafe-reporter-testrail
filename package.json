@@ -32,9 +32,9 @@
     "trailingComma": "all",
     "arrowParens": "avoid"
   },
-  "name": "testcafe-reporter-testrail",
+  "name": "testcafe-reporter-testrail-alter",
   "author": "Denis Akiyakov",
-  "module": "dist/testcafe-reporter-testrail.esm.js",
+  "module": "dist/testcafe-reporter-testrail-alter.esm.js",
   "devDependencies": {
     "husky": "^4.2.5",
     "tsdx": "^0.13.3",

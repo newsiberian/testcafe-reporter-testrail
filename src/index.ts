@@ -28,7 +28,6 @@ enum TestStatus {
 
 module.exports = function() {
   return {
-    noColors: true,
     results: [] as TestrailApiClient.INewTestResult[],
 
     reportTaskStart(/* startTime, userAgents, testCount */) {
@@ -44,7 +43,6 @@ module.exports = function() {
     },
 
     reportTestDone(name: string, testRunInfo: TestRunInfo, meta: TestMeta) {
-      console.log(meta);
       if (typeof meta.CID !== 'number') {
         this.throwError(`Can\'t find Testrail Case ID in test (${name}) meta`);
 
